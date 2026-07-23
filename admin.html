@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台管理</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#F0F2F5;color:#1F2937;line-height:1.6;-webkit-font-smoothing:antialiased}
+.container{max-width:700px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(135deg,#14B8A6,#0D9488);color:#fff;padding:16px 20px;border-radius:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px;font-weight:700}
+.header a{color:#fff;font-size:14px;text-decoration:none;opacity:.85;padding:6px 12px;border:1px solid rgba(255,255,255,.4);border-radius:20px}
+.section{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.section h2{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.form-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.form-row:last-child{margin-bottom:0}
+.form-group{flex:1;min-width:120px}
+.form-group label{display:block;font-size:13px;color:#6B7280;margin-bottom:4px;font-weight:500}
+.form-group input,.form-group select{width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:#14B8A6}
+.form-group select{background:#fff}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:linear-gradient(135deg,#14B8A6,#0D9488);color:#fff;box-shadow:0 2px 8px rgba(20,184,166,.25)}
+.btn-outline{background:#fff;color:#14B8A6;border:1.5px solid #14B8A6}
+.btn-danger{background:#FEE2E2;color:#DC2626;border:none}
+.btn-sm{padding:6px 14px;font-size:13px}
+.section-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+/* 系列管理 */
+.series-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;background:#F9FAFB;padding:8px 12px;border-radius:10px}
+.series-row .series-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+.series-row input{flex:1;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:6px;font-size:14px;font-family:inherit}
+.series-row input:focus{outline:none;border-color:#14B8A6}
+.series-del{width:28px;height:28px;border-radius:50%;border:none;background:#FEE2E2;color:#DC2626;font-size:14px;cursor:pointer;flex-shrink:0}
+/* 系列分组 */
+.series-group{margin-bottom:16px}
+.series-group-title{font-size:15px;font-weight:700;padding:10px 14px;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.series-group-title .sg-left{display:flex;align-items:center;gap:10px}
+.series-group-title .sg-dot{width:14px;height:14px;border-radius:50%}
+.series-group-title .sg-count{font-size:12px;font-weight:400;color:#6B7280}
+.series-group-title .sg-add{font-size:12px;font-weight:500;color:#14B8A6;cursor:pointer;border:1px solid #14B8A6;padding:3px 10px;border-radius:12px;background:transparent}
+/* 产品卡片 */
+.product-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border:1.5px solid #E5E7EB;transition:border-color .2s}
+.product-card:hover{border-color:#14B8A6}
+.product-card-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.product-image-area{width:60px;height:60px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#E5E7EB;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;border:2px dashed #D1D5DB;transition:all .2s}
+.product-image-area:hover{border-color:#14B8A6;background:#F0FDFA}
+.product-image-area img{width:100%;height:100%;object-fit:cover}
+.product-image-area .placeholder{font-size:20px;color:#9CA3AF}
+.product-image-area .upload-hint{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:9px;text-align:center;padding:1px 0;opacity:0;transition:opacity .2s}
+.product-image-area:hover .upload-hint{opacity:1}
+.product-delete{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:none;background:#FEE2E2;color:#DC2626;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.product-delete:active{background:#FCA5A5}
+.product-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+/* 活动设置 */
+.promo-section{background:#F9FAFB;border-radius:8px;padding:10px;margin-top:10px;border:1px solid #E5E7EB}
+.promo-title{font-size:13px;font-weight:600;color:#14B8A6;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.promo-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px}
+.promo-field{display:none}
+.promo-field.active{display:block}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(0,0,0,.82);color:#fff;font-size:14px;padding:10px 24px;border-radius:24px;z-index:999;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.stats{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.stat-item{flex:1;min-width:70px;background:#F0FDFA;border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:22px;font-weight:700;color:#14B8A6}
+.stat-label{font-size:12px;color:#6B7280;margin-top:2px}
+.hidden-file{display:none}
+.empty-hint{text-align:center;padding:40px 20px;color:#9CA3AF;font-size:14px}
+.sec-count{font-weight:400;font-size:13px;color:#9CA3AF}
+@media(max-width:480px){
+  .product-fields{grid-template-columns:repeat(2,1fr)}
+  .promo-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🛠 后台管理</h1>
+    <a href="index.html" target="_blank">预览订货页 →</a>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat-item"><div class="stat-num" id="statCount">20</div><div class="stat-label">产品数</div></div>
+    <div class="stat-item"><div class="stat-num" id="statSeries">4</div><div class="stat-label">系列数</div></div>
+    <div class="stat-item"><div class="stat-num" id="statImages">0</div><div class="stat-label">已有图片</div></div>
+    <div class="stat-item"><div class="stat-num" id="statStorage">0KB</div><div class="stat-label">存储占用</div></div>
+  </div>
+
+  <!-- 品牌设置 -->
+  <div class="section">
+    <h2>🏷️ 品牌设置</h2>
+    <div class="form-row">
+      <div class="form-group"><label>品牌名称</label><input id="brandName" placeholder="你的品牌名"></div>
+      <div class="form-group"><label>副标题</label><input id="brandSubtitle" placeholder="如：门店订货系统"></div>
+    </div>
+  </div>
+
+  <!-- 系列管理 -->
+  <div class="section">
+    <h2>📂 系列管理 <span class="sec-count">（共<span id="seriesCount">0</span>个）</span></h2>
+    <p style="font-size:13px;color:#9CA3AF;margin-bottom:10px">修改系列名称，最多支持6个系列</p>
+    <div id="seriesList"></div>
+    <div class="section-actions">
+      <button class="btn btn-outline btn-sm" onclick="addSeries()">+ 添加系列</button>
+    </div>
+  </div>
+
+  <!-- 产品管理（按系列分组） -->
+  <div class="section">
+    <h2>📦 产品管理 <span class="sec-count">（共<span id="productCount">0</span>个）</span></h2>
+    <div id="productList"></div>
+  </div>
+
+  <!-- 底部操作 -->
+  <div class="section-actions" style="padding:0 0 30px;justify-content:space-between">
+    <button class="btn btn-danger" onclick="resetAll()">🔄 恢复默认</button>
+    <button class="btn btn-primary" style="padding:12px 32px;font-size:15px" onclick="saveAll()">💾 保存全部</button>
+  </div>
+
+</div>
+
+<input type="file" accept="image/*" class="hidden-file" id="fileInput" onchange="handleFile(event)">
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// 默认数据
+// ============================================
+const DEFAULTS = {
+  brand: { name: '小七宠物', subtitle: '门店订货系统' },
+  series: [
+    { key: 'series1', name: '极光系列', color: '#FF6B6B' },
+    { key: 'series2', name: '双A系列', color: '#4FACFE' },
+    { key: 'series3', name: '繁花系列', color: '#43E97B' },
+    { key: 'series4', name: '其他产品', color: '#F5AF19' },
+  ],
+  products: [
+    { id:1,  name:'小七极光除臭清洁香波4L【A1】',               series:'series1', price:292, target:'犬猫通用', image:'', promotion:{type:'discount',  label:'满4桶75折', minQty:4, rate:0.75} },
+    { id:2,  name:'小七极光除臭清洁香波（淡香版）4L【A1.1】',       series:'series1', price:292, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:3,  name:'小七极光去油除毛香波4L【A2】',               series:'series1', price:292, target:'猫专用',   image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:4,  name:'小七极光水润体膜4L【A3】',                  series:'series1', price:292, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:5,  name:'小七极光皮脂清洁精华1L【A4】',              series:'series1', price:219, target:'猫专用',   image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:6,  name:'小七极光维C透白香波4L【A5】',               series:'series1', price:350, target:'犬猫通用', image:'', promotion:{type:'discount',  label:'满4桶75折', minQty:4, rate:0.75} },
+    { id:7,  name:'小七极光皮毛净化沐浴泥2L【A6】',             series:'series1', price:292, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:8,  name:'小七极光抑菌止痒香波2L【A7】',              series:'series1', price:292, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:9,  name:'小七极光保湿清洁香波4L【A8】',               series:'series1', price:350, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:10, name:'小七极光保湿滋养护毛素4L【A9】',             series:'series1', price:350, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:11, name:'小七极光1号香氛护理油100ml',                series:'series1', price: 98, target:'犬猫通用', image:'', promotion:{type:'secondHalf',label:'第2瓶半价', rate:0.5} },
+    { id:12, name:'小七极光2号香氛护理油100ml',                series:'series1', price: 98, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:13, name:'小七极光角鲨烷耳道洁护液100ml',              series:'series1', price: 34, target:'犬猫通用', image:'', promotion:{type:'buyXgetY',  label:'买5送1', buy:5, get:1} },
+    { id:14, name:'小七极光开结修复精粹水200ml',                series:'series1', price: 50, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:15, name:'小七极光多效精华蓬松水200ml',                series:'series1', price: 50, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:16, name:'小七极光香波绵绵搅拌杯',                     series:'series1', price: 68, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:17, name:'小七极光除毛按摩梳',                         series:'series1', price: 18, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:18, name:'小七双A鱼油美毛清洁香波3.78L',              series:'series2', price: 85, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:19, name:'小七双A好香清洁香波3.78L',                 series:'series2', price: 89, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:20, name:'小七双A好白清洁香波3.78L',                 series:'series2', price: 99, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:21, name:'小七双A鱼油除臭留香清洁香波Pro版 3.78L',    series:'series2', price:115, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:22, name:'小七双A洗护全效香波3.78L',                 series:'series2', price:115, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:23, name:'小七双A鱼油美毛蓬松护毛素3.78L',            series:'series2', price: 85, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:24, name:'小七双A鱼油美毛垂顺护毛素3.78L',            series:'series2', price: 85, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:25, name:'小七双A好干净洁耳水1.8L',                   series:'series2', price: 85, target:'犬猫通用', image:'', promotion:{type:'buyXgetY',  label:'买1送2', buy:1, get:2} },
+    { id:26, name:'小七双A角鲨烷好清爽去油膏1L',               series:'series2', price: 85, target:'猫专用',   image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:27, name:'小七双A留香护毛喷雾100ml',                   series:'series2', price: 32, target:'犬猫通用', image:'', promotion:{type:'buyXgetY',  label:'买3送1', buy:3, get:1} },
+    { id:28, name:'小七繁花系列美毛清洁香波-云雾月桂500ml',      series:'series3', price: 30, target:'犬猫通用', image:'', promotion:{type:'buyXgetY',  label:'买10送2', buy:10, get:2} },
+    { id:29, name:'小七繁花系列美毛清洁香波-荒野玫瑰500ml',      series:'series3', price: 30, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:30, name:'小七繁花系列美毛清洁香波-冬日山茶500ml',      series:'series3', price: 30, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:31, name:'小七一次性洗护柔巾50条/包',                  series:'series4', price:342, target:'犬猫通用', image:'', promotion:{type:'none',      label:'裸价销售'} },
+    { id:32, name:'小七猫咪专用S型曲线排梳',                     series:'series4', price:138, target:'猫专用',   image:'', promotion:{type:'none',      label:'裸价销售'} },
+  ]
+};
+
+let store = JSON.parse(JSON.stringify(DEFAULTS));
+let editingImageId = null;
+let imageCache = {}; // { imgKey: base64 }
+
+const IMG_DB_NAME = 'ProductImagesDB';
+const IMG_STORE = 'images';
+
+// ============================================
+// IndexedDB 图片存储
+// ============================================
+function openImgDB() {
+  return new Promise(function(resolve, reject) {
+    if (!window.indexedDB) { resolve(null); return; }
+    var req = indexedDB.open(IMG_DB_NAME, 1);
+    req.onerror = function() { reject(req.error); };
+    req.onsuccess = function() { resolve(req.result); };
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(IMG_STORE)) db.createObjectStore(IMG_STORE);
+    };
+  });
+}
+
+function saveImageToDB(key, base64) {
+  return openImgDB().then(function(db) {
+    if (!db) return Promise.reject('no indexedDB');
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction([IMG_STORE], 'readwrite');
+      tx.objectStore(IMG_STORE).put(base64, key);
+      tx.oncomplete = function() { imageCache[key] = base64; resolve(); };
+      tx.onerror = function() { reject(tx.error); };
+    });
+  });
+}
+
+function loadImageFromDB(key) {
+  if (imageCache[key]) return Promise.resolve(imageCache[key]);
+  return openImgDB().then(function(db) {
+    if (!db) return Promise.resolve('');
+    return new Promise(function(resolve) {
+      var tx = db.transaction([IMG_STORE], 'readonly');
+      var req = tx.objectStore(IMG_STORE).get(key);
+      req.onsuccess = function() {
+        var data = req.result || '';
+        if (data) imageCache[key] = data;
+        resolve(data);
+      };
+      req.onerror = function() { resolve(''); };
+    });
+  });
+}
+
+function deleteImageFromDB(key) {
+  delete imageCache[key];
+  return openImgDB().then(function(db) {
+    if (!db) return Promise.resolve();
+    return new Promise(function(resolve) {
+      var tx = db.transaction([IMG_STORE], 'readwrite');
+      tx.objectStore(IMG_STORE).delete(key);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { resolve(); };
+    });
+  });
+}
+
+function clearAllImagesDB() {
+  imageCache = {};
+  return openImgDB().then(function(db) {
+    if (!db) return Promise.resolve();
+    return new Promise(function(resolve) {
+      var tx = db.transaction([IMG_STORE], 'readwrite');
+      tx.objectStore(IMG_STORE).clear();
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { resolve(); };
+    });
+  });
+}
+
+function imageKeyFor(productId) {
+  return 'img_' + productId;
+}
+
+// ============================================
+// 数据加载
+// ============================================
+function loadData() {
+  try {
+    var raw = localStorage.getItem('storeData');
+    // 旧版本可能把大图 base64 存在 localStorage，超过 2MB 直接清空用默认
+    if (raw && raw.length > 2 * 1024 * 1024) {
+      console.warn('storeData 过大，自动清空');
+      localStorage.removeItem('storeData');
+      raw = null;
+    }
+    if (raw) {
+      var saved = JSON.parse(raw);
+      if (saved.brand) store.brand = saved.brand;
+      if (saved.series && saved.series.length) store.series = saved.series;
+      if (saved.products && saved.products.length) store.products = saved.products;
+    }
+  } catch(e) {
+    console.warn('localStorage 读取失败，使用默认数据', e);
+  }
+  // 补全旧数据字段 / 迁移旧图片到 IndexedDB
+  store.products.forEach(function(p) {
+    if (!p.series) p.series = 'series1';
+    if (!p.image) p.image = '';
+    if (!p.promotion) p.promotion = { type: 'none', label: '裸价销售' };
+    if (!p.promotion.type) p.promotion.type = 'none';
+    if (!p.promotion.label) p.promotion.label = '裸价销售';
+    delete p.size; delete p.category; delete p.usage; delete p.dilution; delete p.emoji;
+
+    // 旧数据：image 存的是 base64，迁移到 IndexedDB
+    if (p.image && p.image.startsWith('data:')) {
+      var key = imageKeyFor(p.id);
+      saveImageToDB(key, p.image).catch(function(){});
+      p.image = key;
+    }
+  });
+}
+
+// ============================================
+// 保存全部
+// ============================================
+function saveAll() {
+  // 品牌
+  store.brand.name = document.getElementById('brandName').value.trim() || DEFAULTS.brand.name;
+  store.brand.subtitle = document.getElementById('brandSubtitle').value.trim() || DEFAULTS.brand.subtitle;
+
+  // 系列
+  var sRows = document.querySelectorAll('.series-row');
+  var seriesList = [];
+  sRows.forEach(function(row, idx) {
+    var input = row.querySelector('input');
+    seriesList.push({
+      key: store.series[idx] ? store.series[idx].key : ('series' + (idx + 1)),
+      name: input.value.trim() || ('系列' + (idx + 1)),
+      color: store.series[idx] ? store.series[idx].color : '#14B8A6',
+    });
+  });
+  store.series = seriesList;
+
+  // 产品（从表单收集）
+  var cards = document.querySelectorAll('.product-card');
+  var products = [];
+  cards.forEach(function(card, idx) {
+    var type = card.querySelector('.p-promo-type').value;
+    var promotion = { type: type, label: (card.querySelector('.p-promo-label').value.trim() || '裸价销售') };
+
+    if (type === 'discount') {
+      promotion.minQty = parseInt(card.querySelector('.p-promo-minQty').value) || 1;
+      promotion.rate = parseFloat(card.querySelector('.p-promo-rate').value) || 1;
+    } else if (type === 'buyXgetY') {
+      promotion.buy = parseInt(card.querySelector('.p-promo-buy').value) || 1;
+      promotion.get = parseInt(card.querySelector('.p-promo-get').value) || 1;
+    } else if (type === 'secondHalf') {
+      promotion.rate = parseFloat(card.querySelector('.p-promo-rate').value) || 0.5;
+    }
+
+    products.push({
+      id: store.products[idx] ? store.products[idx].id : (idx + 1),
+      name: card.querySelector('.p-name').value.trim() || '未命名',
+      series: card.querySelector('.p-series').value,
+      price: parseFloat(card.querySelector('.p-price').value) || 0,
+      target: card.querySelector('.p-target').value.trim() || '',
+      image: store.products[idx] ? (store.products[idx].image || '') : '',
+      promotion: promotion,
+    });
+  });
+  store.products = products;
+
+  // 保存元数据到 localStorage（不含图片 base64）
+  try {
+    localStorage.setItem('storeData', JSON.stringify(store));
+    showToast('✅ 保存成功！刷新订货页即可看到效果');
+  } catch(e) {
+    showToast('❌ 保存失败：' + e.message);
+  }
+  updateStats();
+}
+
+// ============================================
+// 恢复默认
+// ============================================
+function resetAll() {
+  if (!confirm('确定要恢复到默认数据吗？你修改的内容和图片将会丢失。')) return;
+  store = JSON.parse(JSON.stringify(DEFAULTS));
+  localStorage.removeItem('storeData');
+  clearAllImagesDB().then(function() { renderAll(); });
+  showToast('已恢复默认');
+}
+
+// ============================================
+// 系列操作
+// ============================================
+function addSeries() {
+  if (store.series.length >= 6) { showToast('最多6个系列'); return; }
+  var idx = store.series.length + 1;
+  store.series.push({ key: 'series' + idx, name: '系列' + idx, color: '#14B8A6' });
+  renderAll();
+}
+
+function removeSeries(idx) {
+  if (store.series.length <= 1) { showToast('至少保留一个系列'); return; }
+  store.series.splice(idx, 1);
+  renderAll();
+}
+
+// ============================================
+// 产品操作
+// ============================================
+function addProduct(seriesKey) {
+  var maxId = store.products.reduce(function(m, p) { return Math.max(m, p.id); }, 0);
+  store.products.push({
+    id: maxId + 1,
+    name: '',
+    series: seriesKey || store.series[0].key,
+    price: 0,
+    target: '',
+    image: '',
+    promotion: { type: 'none', label: '裸价销售' }
+  });
+  renderProductList();
+  updateStats();
+}
+
+function removeProduct(idx) {
+  if (store.products.length <= 1) { showToast('至少保留一个产品'); return; }
+  var p = store.products[idx];
+  if (p.image) deleteImageFromDB(p.image);
+  store.products.splice(idx, 1);
+  renderProductList();
+  updateStats();
+}
+
+// ============================================
+// 图片上传
+// ============================================
+function triggerUpload(idx) {
+  editingImageId = idx;
+  document.getElementById('fileInput').click();
+}
+
+function handleFile(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast('图片不要超过5MB'); return; }
+
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxW = 320;
+      var w = img.width, h = img.height;
+      if (w > maxW) { h = (maxW / w) * h; w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var base64 = canvas.toDataURL('image/jpeg', 0.55);
+
+      var p = store.products[editingImageId];
+      var oldKey = p.image;
+      var newKey = imageKeyFor(p.id);
+
+      // 删除旧图
+      if (oldKey && oldKey !== newKey) deleteImageFromDB(oldKey);
+
+      saveImageToDB(newKey, base64).then(function() {
+        p.image = newKey;
+        renderProductList();
+        updateStats();
+        showToast('图片上传成功');
+      }).catch(function(err) {
+        showToast('❌ 图片保存失败：' + err);
+      });
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function removeImage(idx) {
+  var p = store.products[idx];
+  if (p.image) deleteImageFromDB(p.image);
+  p.image = '';
+  renderProductList();
+  updateStats();
+}
+
+// ============================================
+// 活动类型切换
+// ============================================
+function onPromoTypeChange(select) {
+  var card = select.closest('.product-card');
+  var type = select.value;
+  card.querySelectorAll('.promo-field').forEach(function(el) {
+    var types = (el.dataset.type || '').split(' ');
+    el.classList.toggle('active', types.indexOf(type) !== -1);
+  });
+}
+
+// ============================================
+// 渲染
+// ============================================
+function renderAll() {
+  document.getElementById('brandName').value = store.brand.name;
+  document.getElementById('brandSubtitle').value = store.brand.subtitle;
+  renderSeriesList();
+  renderProductList();
+  updateStats();
+}
+
+function renderSeriesList() {
+  document.getElementById('seriesCount').textContent = store.series.length;
+  var container = document.getElementById('seriesList');
+  container.innerHTML = store.series.map(function(s, i) {
+    return '<div class="series-row">' +
+      '<div class="series-dot" style="background:' + escAttr(s.color || '#14B8A6') + '"></div>' +
+      '<input value="' + escAttr(s.name) + '" placeholder="系列名称" oninput="updateSeriesName(' + i + ', this.value)">' +
+      '<button class="series-del" onclick="removeSeries(' + i + ')" title="删除系列">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+function updateSeriesName(idx, value) {
+  store.series[idx].name = value.trim() || ('系列' + (idx + 1));
+  renderProductList();
+}
+
+function renderProductList() {
+  var container = document.getElementById('productList');
+  document.getElementById('productCount').textContent = store.products.length;
+
+  // 按系列分组
+  var html = '';
+  store.series.forEach(function(s) {
+    var list = store.products.filter(function(p) { return p.series === s.key; });
+
+    html += '<div class="series-group">';
+    html += '<div class="series-group-title" style="background:' + escAttr(s.color || '#14B8A6') + '10">';
+    html += '<div class="sg-left"><div class="sg-dot" style="background:' + escAttr(s.color || '#14B8A6') + '"></div>' + escAttr(s.name) + ' <span class="sg-count">' + list.length + '个产品</span></div>';
+    html += '<button class="sg-add" onclick="addProduct(\'' + escAttr(s.key) + '\')">+ 添加</button>';
+    html += '</div>';
+
+    if (list.length === 0) {
+      html += '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px">该系列暂无产品，点击上方"+ 添加"</div>';
+    } else {
+      list.forEach(function(p) {
+        var idx = store.products.indexOf(p);
+        var selOpts = store.series.map(function(ss) {
+          return '<option value="' + escAttr(ss.key) + '"' + (ss.key === p.series ? ' selected' : '') + '>' + escAttr(ss.name) + '</option>';
+        }).join('');
+
+        var promo = p.promotion || { type: 'none', label: '裸价销售' };
+        var typeOpts = [
+          ['none', '无活动'],
+          ['discount', '满N件打X折'],
+          ['buyXgetY', '买X送Y'],
+          ['secondHalf', '第2件半价']
+        ].map(function(o) {
+          return '<option value="' + o[0] + '"' + (promo.type === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+        }).join('');
+
+        var imgAreaId = 'img-area-' + p.id;
+
+        html += '<div class="product-card">' +
+          '<div class="product-card-header">' +
+            '<div class="product-image-area" id="' + imgAreaId + '" onclick="triggerUpload(' + idx + ')" title="上传图片">' +
+              (p.image
+                ? '<img src="" data-img-key="' + escAttr(p.image) + '" alt="">'
+                : '<span class="placeholder">📷</span>') +
+              '<div class="upload-hint">' + (p.image ? '换图' : '上传') + '</div>' +
+            '</div>' +
+            '<div style="flex:1;min-width:0">' +
+              '<div class="product-fields">' +
+                '<div class="form-group"><label>产品名称</label><input class="p-name" value="' + escAttr(p.name) + '" placeholder="产品名称"></div>' +
+                '<div class="form-group" style="max-width:130px"><label>所属系列</label><select class="p-series">' + selOpts + '</select></div>' +
+                '<div class="form-group" style="max-width:90px"><label>价格 ¥</label><input class="p-price" type="number" min="0" step="0.01" value="' + p.price + '"></div>' +
+                '<div class="form-group" style="max-width:100px"><label>适用对象</label><input class="p-target" value="' + escAttr(p.target || '') + '" placeholder="犬用/猫用/通用"></div>' +
+              '</div>' +
+              '<div class="promo-section">' +
+                '<div class="promo-title">🎉 产品活动</div>' +
+                '<div class="form-row">' +
+                  '<div class="form-group" style="max-width:150px"><label>活动类型</label><select class="p-promo-type" onchange="onPromoTypeChange(this)">' + typeOpts + '</select></div>' +
+                  '<div class="form-group"><label>活动标语</label><input class="p-promo-label" value="' + escAttr(promo.label) + '" placeholder="如：满4桶75折"></div>' +
+                '</div>' +
+                '<div class="promo-row">' +
+                  '<div class="form-group promo-field ' + (promo.type === 'discount' ? 'active' : '') + '" data-type="discount"><label>满几件</label><input class="p-promo-minQty" type="number" min="1" value="' + (promo.minQty || 4) + '"></div>' +
+                  '<div class="form-group promo-field ' + (promo.type === 'discount' || promo.type === 'secondHalf' ? 'active' : '') + '" data-type="discount secondHalf"><label>折扣（0.75=75折）</label><input class="p-promo-rate" type="number" min="0.1" max="1" step="0.05" value="' + (promo.rate || (promo.type === 'secondHalf' ? 0.5 : 0.75)) + '"></div>' +
+                  '<div class="form-group promo-field ' + (promo.type === 'buyXgetY' ? 'active' : '') + '" data-type="buyXgetY"><label>买几件</label><input class="p-promo-buy" type="number" min="1" value="' + (promo.buy || 1) + '"></div>' +
+                  '<div class="form-group promo-field ' + (promo.type === 'buyXgetY' ? 'active' : '') + '" data-type="buyXgetY"><label>送几件</label><input class="p-promo-get" type="number" min="1" value="' + (promo.get || 1) + '"></div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<button class="product-delete" onclick="removeProduct(' + idx + ')" title="删除">✕</button>' +
+          '</div>' +
+          (p.image ? '<div style="text-align:right;margin-top:4px"><button class="btn btn-sm" style="color:#9CA3AF;font-size:12px" onclick="removeImage(' + idx + ')">移除图片</button></div>' : '') +
+        '</div>';
+      });
+    }
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+
+  // 异步加载图片
+  container.querySelectorAll('img[data-img-key]').forEach(function(img) {
+    var key = img.getAttribute('data-img-key');
+    loadImageFromDB(key).then(function(data) {
+      if (data) img.src = data;
+    });
+  });
+}
+
+function escAttr(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+}
+
+// ============================================
+// 统计
+// ============================================
+function updateStats() {
+  document.getElementById('statCount').textContent = store.products.length;
+  document.getElementById('statSeries').textContent = store.series.length;
+  var imgCount = store.products.filter(function(p) { return p.image; }).length;
+  document.getElementById('statImages').textContent = imgCount;
+  try {
+    var json = JSON.stringify(store);
+    var kb = (new Blob([json]).size / 1024).toFixed(0);
+    document.getElementById('statStorage').textContent = kb + 'KB（文字数据，图片另存）';
+  } catch(e) {
+    document.getElementById('statStorage').textContent = '?';
+  }
+}
+
+// ============================================
+// Toast
+// ============================================
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// ============================================
+// 启动
+// ============================================
+loadData();
+renderAll();
+</script>
+</body>
+</html>
