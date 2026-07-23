@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#14B8A6">
+  <title>宠浴精选 · 门店订货系统</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部品牌区 -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="brand-name" id="brandName">宠浴精选</h1>
+        <p class="brand-subtitle" id="brandSubtitle">门店订货系统</p>
+      </div>
+    </header>
+
+    <!-- 活动横幅 -->
+    <div class="promo-banner" id="promoBanner">
+      <span class="promo-icon">🎉</span>
+      <span class="promo-text">各产品活动不同，点产品卡片查看优惠</span>
+    </div>
+
+    <!-- 系列筛选 -->
+    <div class="series-tabs" id="seriesTabs"></div>
+
+    <!-- 产品列表 -->
+    <main class="product-grid" id="productGrid"></main>
+
+    <!-- 底部购物车栏 -->
+    <div class="cart-bar" id="cartBar">
+      <div class="cart-bar-left">
+        <div class="cart-icon-wrapper">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </div>
+        <div class="cart-total">
+          <span class="cart-total-label">合计</span>
+          <span class="cart-total-amount" id="cartTotal">¥0</span>
+        </div>
+      </div>
+      <button class="cart-bar-btn" id="openCartBtn">查看清单</button>
+    </div>
+
+    <!-- 购物车弹窗 -->
+    <div class="overlay" id="cartOverlay">
+      <div class="modal cart-modal">
+        <div class="modal-header">
+          <h2>订货清单</h2>
+          <button class="close-btn" id="closeCartBtn">✕</button>
+        </div>
+        <div class="modal-body" id="cartItems"></div>
+        <div class="modal-footer">
+          <div class="cart-summary" id="cartSummary"></div>
+          <div class="cart-footer-actions">
+            <button class="clear-btn" id="clearCartBtn">清空</button>
+            <button class="checkout-btn" id="checkoutBtn">确认下单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单确认弹窗 -->
+    <div class="overlay" id="orderOverlay">
+      <div class="modal order-modal" id="orderModal"></div>
+    </div>
+
+    <!-- 提示 toast -->
+    <div class="toast" id="toast"></div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
